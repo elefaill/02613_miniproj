@@ -41,7 +41,6 @@ def summary_stats(u, interior_mask):
         'pct_below_15': pct_below_15,
     }
 
-
 if __name__ == '__main__':
     # Load data
     LOAD_DIR = '/dtu/projects/02613_2025/data/modified_swiss_dwellings/'
