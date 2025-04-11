@@ -9,7 +9,9 @@ def load_building_data(load_dir, building_id):
     u[1:-1, 1:-1] = np.load(join(load_dir, f"{building_id}_domain.npy"))
     interior_mask = np.load(join(load_dir, f"{building_id}_interior.npy"))
     return u, interior_mask
+ 
 
+ 
 def plot_building(u, interior_mask, building_id, output_dir="figures"):
     os.makedirs(output_dir, exist_ok=True)
 
