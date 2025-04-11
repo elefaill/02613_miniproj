@@ -30,7 +30,6 @@ def plot_building(u, interior_mask, building_id, output_dir="figures"):
     plt.close()
 
 LOAD_DIR = '/dtu/projects/02613_2025/data/modified_swiss_dwellings/'
-
 # You can also read the actual building_ids.txt if you want
 example_building_ids = ['25806', '28082', '6086']  # Replace with real IDs available to you
 
