@@ -1,7 +1,7 @@
 # this is the original code from the text of the mini-project 
 from os.path import join
 import sys
-
+import random
 import numpy as np
 
 
@@ -44,6 +44,7 @@ def summary_stats(u, interior_mask):
 if __name__ == '__main__':
     # Load data
     LOAD_DIR = '/dtu/projects/02613_2025/data/modified_swiss_dwellings/'
+
     with open(join(LOAD_DIR, 'building_ids.txt'), 'r') as f:
         building_ids = f.read().splitlines()
 
@@ -51,7 +52,8 @@ if __name__ == '__main__':
         N = 1
     else:
         N = int(sys.argv[1])
-    building_ids = building_ids[:N]
+    # building_ids = building_ids[:N]
+    building_ids = random.sample(building_ids, N)
 
     # Load floor plans
     all_u0 = np.empty((N, 514, 514))
