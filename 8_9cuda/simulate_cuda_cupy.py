@@ -1,7 +1,6 @@
 from os.path import join
 import sys
 import random
-from functools import wraps
 import time
 from numba import cuda
 import numpy as np
@@ -25,38 +24,27 @@ def jacobi_kernel(u, u_new, interior_mask):
             )
 
 def jacobi_cuda(u0, interior_mask, max_iter):
-    assert u0.shape == (514, 514), "u0 must be 514x514"
-    assert interior_mask.shape == (512, 512), "interior_mask must be 512x512"
-
     # Copy inputs and allocate output
-    u = cp.copy(u0)
-    u_new = cp.copy(u0)
-
-    # Warm-up to initialize CUDA context (for Nsight)
-    cuda.synchronize()
-
-    # Transfer to device
-    u_d = cuda.to_device(u)
-    u_new_d = cuda.to_device(u_new)
-    mask_d = cuda.to_device(interior_mask)
-
+    u = u0.copy()
+    u_new = u0.copy()
+  
     # Configure thread and block sizes
     threads_per_block = (16, 16)
     blocks_per_grid_x = (u.shape[0] + threads_per_block[0] - 1) // threads_per_block[0]
     blocks_per_grid_y = (u.shape[1] + threads_per_block[1] - 1) // threads_per_block[1]
     blocks_per_grid = (blocks_per_grid_x, blocks_per_grid_y)
 
+    # Transfer CuPy arrays to Numba device arrays
+    u_d = cuda.to_device(u)
+    u_new_d = cuda.to_device(u_new)
+    mask_d = cuda.to_device(interior_mask)
+
     
     # Run Jacobi iterations
     for _ in range(max_iter):
         jacobi_kernel[blocks_per_grid, threads_per_block](u_d, u_new_d, mask_d)
-        cuda.synchronize()  # Ensure kernel completion is visible in profiler
         u_d, u_new_d = u_new_d, u_d  # Swap buffers
 
-    
-
-    # Final synchronization and copy back to host
-    cuda.synchronize()
     return u_d
 
 def summary_stats(u, interior_mask):
@@ -101,7 +89,7 @@ if __name__ == '__main__':
     for i, (u0, interior_mask) in enumerate(zip(all_u0, all_interior_mask)):
         print(f"Running Jacobi on GPU for building {i+1}/{N}")
         u = jacobi_cuda(u0, interior_mask, MAX_ITER)
-        all_u[i] = cp.asarray(u)
+        all_u[i] = u
 
     # Print summary statistics in CSV format
     stat_keys = ['mean_temp', 'std_temp', 'pct_above_18', 'pct_below_15']

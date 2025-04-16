@@ -1,7 +1,6 @@
 from os.path import join
 import sys
 import random
-from functools import wraps
 import time
 from numba import cuda
 import numpy as np
@@ -24,38 +23,24 @@ def jacobi_kernel(u, u_new, interior_mask):
             )
 
 def jacobi_cuda(u0, interior_mask, max_iter):
-    assert u0.shape == (514, 514), "u0 must be 514x514"
-    assert interior_mask.shape == (512, 512), "interior_mask must be 512x512"
-
-    # Copy inputs and allocate output
-    u = np.copy(u0)
-    u_new = np.copy(u0)
-
-    # Warm-up to initialize CUDA context (for Nsight)
-    cuda.synchronize()
-
+    
     # Transfer to device
-    u_d = cuda.to_device(u)
-    u_new_d = cuda.to_device(u_new)
+    u_d = cuda.to_device(u0)
+    u_new_d = cuda.to_device(u0.copy())
     mask_d = cuda.to_device(interior_mask)
 
     # Configure thread and block sizes
     threads_per_block = (16, 16)
-    blocks_per_grid_x = (u.shape[0] + threads_per_block[0] - 1) // threads_per_block[0]
-    blocks_per_grid_y = (u.shape[1] + threads_per_block[1] - 1) // threads_per_block[1]
+    blocks_per_grid_x = (u0.shape[0] + threads_per_block[0] - 1) // threads_per_block[0]
+    blocks_per_grid_y = (u0.shape[1] + threads_per_block[1] - 1) // threads_per_block[1]
     blocks_per_grid = (blocks_per_grid_x, blocks_per_grid_y)
 
     
     # Run Jacobi iterations
     for _ in range(max_iter):
         jacobi_kernel[blocks_per_grid, threads_per_block](u_d, u_new_d, mask_d)
-        cuda.synchronize()  # Ensure kernel completion is visible in profiler
         u_d, u_new_d = u_new_d, u_d  # Swap buffers
 
-    
-
-    # Final synchronization and copy back to host
-    cuda.synchronize()
     return u_d.copy_to_host()
 
 def summary_stats(u, interior_mask):
