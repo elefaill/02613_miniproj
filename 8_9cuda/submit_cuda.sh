@@ -15,4 +15,12 @@
 source /dtu/projects/02613_2025/conda/conda_init.sh
 conda activate 02613
 
-time python simulate_cuda.py 10
+
+#time python simulate_cuda.py 10
+
+
+# Step 1: Run profiling on 10 floorplans using your script
+nsys profile -o prof_cupy_run python simulate_cuda_cupy.py 10
+
+# Step 2: Save profiler statistics to a readable text file
+nsys stats prof_cupy_run.nsys-rep > prof_cupy_summary.txt
