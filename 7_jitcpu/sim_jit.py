@@ -1,4 +1,4 @@
-# this is the original code from the text of the mini-project CHANGED THE JACOPI FUNCTION PUTING JIT
+# this is the code from the text of the mini-project adding THE JACOBI JIT FUNCTION
 from os.path import join
 import sys
 from numba import jit
@@ -37,7 +37,7 @@ def jacobi_jit(u, interior_mask, max_iter, atol=1e-6):
         delta = 0.0
         for i in range(1, u.shape[0] - 1):
             for j in range(1, u.shape[1] - 1):
-                if interior_mask[i - 1, j - 1]:  # perché mask è 512x512
+                if interior_mask[i - 1, j - 1]: 
                     val = 0.25 * (
                         u[i-1, j] + u[i+1, j] + u[i, j-1] + u[i, j+1]
                     )
