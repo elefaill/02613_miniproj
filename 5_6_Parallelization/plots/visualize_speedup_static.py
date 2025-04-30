@@ -29,7 +29,7 @@ current_dir = os.path.dirname(__file__)
 plots_dir = os.path.join(current_dir, 'plots')
 os.makedirs(plots_dir, exist_ok=True)
 # Save the plot in the 'plots' folder in the same subfolder as the script
-plt.savefig(os.path.join(plots_dir, 'point_5_speedup_dynamic_v2.png'))
+plt.savefig(os.path.join(plots_dir, 'point_5_speedup_static_v2.png'))
 
 print(
     f"Parallel fraction F = {F}, Serial Fraction B = 1 - F = {1-F}\n"
