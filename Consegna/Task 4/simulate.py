@@ -1,10 +1,10 @@
+# this is the original code from the text of the mini-project 
 from os.path import join
-import os
 import sys
-import matplotlib.pyplot as plt
-
+import random
 import numpy as np
-
+from functools import wraps
+import time
 
 def load_data(load_dir, bid):
     SIZE = 512
@@ -13,7 +13,7 @@ def load_data(load_dir, bid):
     interior_mask = np.load(join(load_dir, f"{bid}_interior.npy"))
     return u, interior_mask
 
-
+@profile
 def jacobi(u, interior_mask, max_iter, atol=1e-6):
     u = np.copy(u)
 
@@ -42,22 +42,10 @@ def summary_stats(u, interior_mask):
         'pct_below_15': pct_below_15,
     }
 
-def plot_building(u, building_id, output_dir="figures"):
-    os.makedirs(output_dir, exist_ok=True)
-
-    plt.figure(figsize=(8, 6))
-    plt.imshow(u[1:-1, 1:-1], cmap='inferno', vmin=0, vmax=25)
-    plt.title(f"Temperature Heat Map\n(Building {building_id})")
-    plt.colorbar(label="Temperature (°C)")
-
-    save_path = os.path.join(output_dir, f"building_{building_id}.png")
-    plt.savefig(save_path)
-    print(f"Saved: {save_path}")
-    plt.close()
-
 if __name__ == '__main__':
     # Load data
     LOAD_DIR = '/dtu/projects/02613_2025/data/modified_swiss_dwellings/'
+
     with open(join(LOAD_DIR, 'building_ids.txt'), 'r') as f:
         building_ids = f.read().splitlines()
 
@@ -65,7 +53,8 @@ if __name__ == '__main__':
         N = 1
     else:
         N = int(sys.argv[1])
-    building_ids = building_ids[:N]
+    # building_ids = building_ids[:N]
+    building_ids = random.sample(building_ids, N)
 
     # Load floor plans
     all_u0 = np.empty((N, 514, 514))
@@ -90,4 +79,3 @@ if __name__ == '__main__':
     for bid, u, interior_mask in zip(building_ids, all_u, all_interior_mask):
         stats = summary_stats(u, interior_mask)
         print(f"{bid},", ", ".join(str(stats[k]) for k in stat_keys))
-        plot_building(u, bid)

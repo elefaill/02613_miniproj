@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 
-time = {1:1205.15, 2:596.935 , 4:278.225, 8:231.496, 16:145.326, 24:139.336}
+time = {1:1174.423, 2:665.374 , 4:391.46, 8:237.66, 16:149.9, 24:139.679}
 # Extract number of processes and corresponding times
 n_procs = list(time.keys())
 times = list(time.values())
@@ -29,10 +29,10 @@ current_dir = os.path.dirname(__file__)
 plots_dir = os.path.join(current_dir, 'plots')
 os.makedirs(plots_dir, exist_ok=True)
 # Save the plot in the 'plots' folder in the same subfolder as the script
-plt.savefig(os.path.join(plots_dir, 'point_5_speedup_dynamic_no_chunk.png'))
+plt.savefig(os.path.join(plots_dir, 'point_5_speedup_dynamic_v2.png'))
 
 print(
     f"Parallel fraction F = {F}, Serial Fraction B = 1 - F = {1-F}\n"
     f"Theoretical speedup S = 1/B = {1/(1-F)}\n"
-    f"Speedup with 32 processors = {1/(1-F+F/32)}"
+    f"Speedup with 32 processors = {1/(1-F+F/24)}"
 )

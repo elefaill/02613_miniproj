@@ -10,9 +10,13 @@
 #BSUB -e minip_%J.err
 #BSUB -B
 #BSUB -N
-#BSUB -u s243151@dtu.dk
+#BSUB -u s243157@dtu.dk
 
 source /dtu/projects/02613_2025/conda/conda_init.sh
 conda activate 02613
 
-time python simulate.py 10
+# 1. Run kernprof to collect line-profiling data
+kernprof -l simulate.py 10
+
+# 2. Analyze the collected data with line_profiler
+python -m line_profiler simulate.py.lprof > simulate.txt
